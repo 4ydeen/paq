@@ -799,41 +799,67 @@ scp paqet user@CLIENT_IP:/home/user/paqet
 
 On your **client machine**, create a file called `config.yaml` in the same folder as paqet.
 
+**First, find your network info:**
+
+| OS | Find Local IP | Find Router MAC |
+|----|---------------|-----------------|
+| Linux | `ip addr` or `hostname -I` | `ip neigh \| grep default` |
+| macOS | `ifconfig en0 \| grep inet` | `arp -a \| grep gateway` |
+| Windows | `ipconfig` | `arp -a` (look for your gateway IP) |
+
 **Copy this and fill in your values:**
 
 ```yaml
 role: "client"
 
+log:
+  level: "info"
+
 socks5:
-  port: 1080
+  - listen: "127.0.0.1:1080"
 
 network:
-  interface: ""
+  interface: "eth0"  # Linux: eth0/wlan0, macOS: en0, Windows: see note below
+  ipv4:
+    addr: "YOUR_LOCAL_IP:0"       # e.g., 192.168.1.100:0
+    router_mac: "YOUR_ROUTER_MAC" # e.g., aa:bb:cc:dd:ee:ff
 
 server:
-  address: "SERVER_IP:PORT"
+  addr: "YOUR_SERVER_IP:8443"
 
 transport:
-  mode: "fast"
-  key: "YOUR_KEY"
+  protocol: "kcp"
+  kcp:
+    mode: "fast"
+    key: "YOUR_SECRET_KEY"
 ```
+
+> **Windows note:** Leave `interface: ""` empty - paqet will auto-detect. Or find your interface name in Network Connections.
 
 **Example with real values:**
 ```yaml
 role: "client"
 
+log:
+  level: "info"
+
 socks5:
-  port: 1080
+  - listen: "127.0.0.1:1080"
 
 network:
-  interface: ""
+  interface: "eth0"
+  ipv4:
+    addr: "192.168.1.100:0"
+    router_mac: "aa:bb:cc:dd:ee:ff"
 
 server:
-  address: "185.1.2.3:8443"
+  addr: "185.1.2.3:8443"
 
 transport:
-  mode: "fast"
-  key: "mySecretKey123"
+  protocol: "kcp"
+  kcp:
+    mode: "fast"
+    key: "mySecretKey123"
 ```
 
 ---
@@ -843,7 +869,7 @@ transport:
 **Linux/macOS:**
 ```bash
 cd ~/paqet              # Go to the folder with paqet
-sudo ./paqet -config config.yaml
+sudo ./paqet run -c config.yaml
 ```
 
 **Windows (must run as Administrator):**
@@ -851,7 +877,7 @@ sudo ./paqet -config config.yaml
 2. Run:
 ```cmd
 cd C:\paqet
-paqet.exe -config config.yaml
+paqet.exe run -c config.yaml
 ```
 
 You should see:
@@ -1659,41 +1685,67 @@ scp paqet user@CLIENT_IP:/home/user/paqet
 
 روی **دستگاه کلاینت**، یک فایل به نام `config.yaml` در همان پوشه‌ای که paqet است بسازید.
 
+**اول اطلاعات شبکه خود را پیدا کنید:**
+
+| سیستم‌عامل | پیدا کردن IP محلی | پیدا کردن MAC روتر |
+|-----------|------------------|-------------------|
+| لینوکس | `ip addr` یا `hostname -I` | `ip neigh \| grep default` |
+| مک | `ifconfig en0 \| grep inet` | `arp -a \| grep gateway` |
+| ویندوز | `ipconfig` | `arp -a` (دنبال IP گیت‌وی بگردید) |
+
 **این را کپی کنید و مقادیر خود را بگذارید:**
 
 ```yaml
 role: "client"
 
+log:
+  level: "info"
+
 socks5:
-  port: 1080
+  - listen: "127.0.0.1:1080"
 
 network:
-  interface: ""
+  interface: "eth0"  # لینوکس: eth0/wlan0، مک: en0، ویندوز: نکته پایین را ببینید
+  ipv4:
+    addr: "YOUR_LOCAL_IP:0"       # مثلاً 192.168.1.100:0
+    router_mac: "YOUR_ROUTER_MAC" # مثلاً aa:bb:cc:dd:ee:ff
 
 server:
-  address: "IP_SERVER:PORT"
+  addr: "YOUR_SERVER_IP:8443"
 
 transport:
-  mode: "fast"
-  key: "YOUR_KEY"
+  protocol: "kcp"
+  kcp:
+    mode: "fast"
+    key: "YOUR_SECRET_KEY"
 ```
+
+> **نکته ویندوز:** مقدار `interface: ""` را خالی بگذارید - paqet خودش تشخیص می‌دهد. یا نام اینترفیس را در Network Connections پیدا کنید.
 
 **مثال با مقادیر واقعی:**
 ```yaml
 role: "client"
 
+log:
+  level: "info"
+
 socks5:
-  port: 1080
+  - listen: "127.0.0.1:1080"
 
 network:
-  interface: ""
+  interface: "eth0"
+  ipv4:
+    addr: "192.168.1.100:0"
+    router_mac: "aa:bb:cc:dd:ee:ff"
 
 server:
-  address: "185.1.2.3:8443"
+  addr: "185.1.2.3:8443"
 
 transport:
-  mode: "fast"
-  key: "mySecretKey123"
+  protocol: "kcp"
+  kcp:
+    mode: "fast"
+    key: "mySecretKey123"
 ```
 
 ---
@@ -1703,7 +1755,7 @@ transport:
 **لینوکس/مک:**
 ```bash
 cd ~/paqet              # به پوشه paqet بروید
-sudo ./paqet -config config.yaml
+sudo ./paqet run -c config.yaml
 ```
 
 **ویندوز (باید به عنوان Administrator اجرا شود):**
@@ -1711,7 +1763,7 @@ sudo ./paqet -config config.yaml
 2. اجرا کنید:
 ```cmd
 cd C:\paqet
-paqet.exe -config config.yaml
+paqet.exe run -c config.yaml
 ```
 
 باید این را ببینید:
