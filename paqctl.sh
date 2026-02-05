@@ -1171,9 +1171,15 @@ install_python_deps() {
         [ -d "$VENV_DIR" ] && rm -rf "$VENV_DIR"
         log_info "Creating Python virtual environment..."
         python3 -m venv "$VENV_DIR" || {
-            log_error "Failed to create virtual environment"
+            log_error "Failed to create virtual environment (is python3-venv installed?)"
             return 1
         }
+    fi
+
+    # Verify pip exists after venv creation
+    if [ ! -x "$VENV_DIR/bin/pip" ]; then
+        log_error "venv created but pip missing (install python3-venv package)"
+        return 1
     fi
 
     # Install packages in venv
@@ -2212,20 +2218,40 @@ install_python_deps() {
     log_info "Installing Python dependencies..."
     if ! command -v python3 &>/dev/null; then
         if command -v apt-get &>/dev/null; then apt-get install -y python3 2>/dev/null
+        elif command -v dnf &>/dev/null; then dnf install -y python3 2>/dev/null
         elif command -v yum &>/dev/null; then yum install -y python3 2>/dev/null
         elif command -v apk &>/dev/null; then apk add python3 2>/dev/null
         fi
     fi
-    # Install python3-venv (version-specific for apt)
+    # Verify Python 3.10+ (required for GFK)
+    local pyver pymajor pyminor
+    pyver=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || echo "0.0")
+    pymajor=$(echo "$pyver" | cut -d. -f1)
+    pyminor=$(echo "$pyver" | cut -d. -f2)
+    if [ "$pymajor" -lt 3 ] || { [ "$pymajor" -eq 3 ] && [ "$pyminor" -lt 10 ]; }; then
+        log_error "Python 3.10+ required, found $pyver"
+        return 1
+    fi
+    # Install python3-venv (version-specific for apt, generic for others)
     if command -v apt-get &>/dev/null; then
-        local pyver; pyver=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null)
-        [ -n "$pyver" ] && apt-get install -y "python${pyver}-venv" 2>/dev/null || apt-get install -y python3-venv 2>/dev/null
+        apt-get install -y "python${pyver}-venv" 2>/dev/null || apt-get install -y python3-venv 2>/dev/null
+    elif command -v dnf &>/dev/null; then
+        dnf install -y python3-pip 2>/dev/null  # dnf includes venv in python3
+    elif command -v yum &>/dev/null; then
+        yum install -y python3-pip 2>/dev/null
+    elif command -v apk &>/dev/null; then
+        apk add py3-pip 2>/dev/null
     fi
     # Use venv (recreate if broken/incomplete)
     local VENV_DIR="$INSTALL_DIR/venv"
     if [ ! -x "$VENV_DIR/bin/pip" ]; then
         [ -d "$VENV_DIR" ] && rm -rf "$VENV_DIR"
-        python3 -m venv "$VENV_DIR" || { log_error "Failed to create venv"; return 1; }
+        python3 -m venv "$VENV_DIR" || { log_error "Failed to create venv (is python3-venv installed?)"; return 1; }
+    fi
+    # Verify pip exists after venv creation
+    if [ ! -x "$VENV_DIR/bin/pip" ]; then
+        log_error "venv created but pip missing (install python${pyver}-venv)"
+        return 1
     fi
     "$VENV_DIR/bin/pip" install --quiet --upgrade pip 2>/dev/null || true
     "$VENV_DIR/bin/pip" install --quiet scapy aioquic 2>/dev/null || { log_error "Failed to install Python packages"; return 1; }
@@ -5459,20 +5485,8 @@ _install_gfk_components() {
     # Save settings with server IP and auth code
     save_settings
 
-    # Create venv if needed
-    if [ ! -d "$INSTALL_DIR/venv" ]; then
-        python3 -m venv "$INSTALL_DIR/venv" || {
-            log_error "Failed to create Python venv"
-            return 1
-        }
-    fi
-
-    # Install Python packages
-    "$INSTALL_DIR/venv/bin/pip" install --quiet --upgrade pip 2>/dev/null || true
-    "$INSTALL_DIR/venv/bin/pip" install --quiet scapy aioquic || {
-        log_error "Failed to install Python packages (scapy, aioquic)"
-        return 1
-    }
+    # Install Python dependencies (venv + scapy + aioquic)
+    install_python_deps || return 1
 
     # Download GFK scripts (server and client)
     download_gfk || return 1
