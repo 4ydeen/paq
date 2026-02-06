@@ -1460,6 +1460,12 @@ setup_xray_for_gfk() {
     local target_port
     target_port=$(echo "${GFK_PORT_MAPPINGS:-14000:443}" | cut -d: -f2 | cut -d, -f1)
 
+    # If xray is already running (e.g. user has a panel), don't touch it
+    if pgrep -x xray &>/dev/null; then
+        log_info "Xray is already running — skipping install/config to preserve existing setup"
+        return 0
+    fi
+
     install_xray || return 1
     configure_xray_socks "$target_port" || return 1
     start_xray || return 1
@@ -5715,6 +5721,10 @@ start_xray() {
 setup_xray_for_gfk() {
     local target_port
     target_port=$(echo "${GFK_PORT_MAPPINGS:-14000:443}" | cut -d: -f2 | cut -d, -f1)
+    if pgrep -x xray &>/dev/null; then
+        log_info "Xray is already running — skipping install/config to preserve existing setup"
+        return 0
+    fi
     install_xray || return 1
     configure_xray_socks "$target_port" || return 1
     start_xray || return 1
