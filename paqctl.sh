@@ -6981,6 +6981,7 @@ show_menu() {
             echo "  1. View status"
             echo "  2. View logs"
             echo "  3. Health check"
+            echo "  4. Update"
             echo ""
 
             # Paqet controls
@@ -7034,6 +7035,7 @@ show_menu() {
             1) show_status; read -n 1 -s -r -p "  Press any key to return..." < /dev/tty || true; redraw=true ;;
             2) show_logs; redraw=true ;;
             3) health_check; read -n 1 -s -r -p "  Press any key to return..." < /dev/tty || true; redraw=true ;;
+            4) update_paqet; read -n 1 -s -r -p "  Press any key to return..." < /dev/tty || true; redraw=true ;;
             p|P)
                 if [ "$paqet_installed" = true ]; then
                     if is_paqet_running; then
