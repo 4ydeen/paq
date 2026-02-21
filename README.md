@@ -107,7 +107,7 @@ YOUR COMPUTER                YOUR VPS                   INTERNET
 ---
 
 <details>
-<summary><strong>Using GFK with an Existing Xray Panel (3x-ui, Marzban, etc.)</strong></summary>
+<summary><strong>Click here if you want to set up GFK alongside an Xray panel (3x-ui, Marzban, etc.) — includes server-to-server bridge setup</strong></summary>
 
 If your foreign server already has an Xray panel (3x-ui, Marzban, etc.), paqctl detects it and works alongside it. Your panel stays untouched — paqctl only adds what's needed.
 
@@ -1226,7 +1226,9 @@ AGPL-3.0 License - See [LICENSE](LICENSE) file.
 ---
 
 <details>
-<summary><strong>استفاده از GFK با پنل Xray موجود (3x-ui، Marzban و غیره)</strong></summary>
+<summary><strong>اینجا کلیک کنید اگر می‌خواهید GFK را در کنار پنل Xray نصب کنید (3x-ui، Marzban و غیره) — شامل راه‌اندازی bridge سرور به سرور</strong></summary>
+
+> **آموزش ویدیویی (فارسی):** [آموزش نصب GFK سرور به سرور با تنظیم outbound در پنل Xray — توسط متین](https://www.youtube.com/watch?v=BrONeIH8WPM)
 
 اگر سرور خارج شما از قبل پنل Xray دارد (3x-ui، Marzban و غیره)، paqctl آن را تشخیص می‌دهد و در کنار آن کار می‌کند. پنل شما دست نخورده می‌ماند — paqctl فقط چیزهای لازم را اضافه می‌کند.
 
