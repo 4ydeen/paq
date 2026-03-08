@@ -1163,6 +1163,14 @@ AGPL-3.0 License - See [LICENSE](LICENSE) file.
 
 ---
 
+## Donate
+
+If you find this project useful and want to support its development, you can donate here:
+
+**[samnet.dev/donate](https://www.samnet.dev/donate/)**
+
+---
+
 ---
 
 # نسخه فارسی
@@ -2150,3 +2158,11 @@ https://github.com/SamNet-dev/paqctl
 - [aioquic](https://github.com/aiortc/aioquic) - پیاده‌سازی QUIC
 - [scapy](https://scapy.net/) - کتابخانه دستکاری بسته
 - [kcptun](https://github.com/xtaci/kcptun) - الهام‌بخش پروتکل KCP
+
+---
+
+## حمایت مالی
+
+اگر این پروژه برایتان مفید بوده و می‌خواهید از توسعه آن حمایت کنید، می‌توانید از اینجا کمک کنید:
+
+**[samnet.dev/donate](https://www.samnet.dev/donate/)**
